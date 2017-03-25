@@ -20,7 +20,23 @@ class ReposDataStore {
                 strongSelf.repositories.append(GithubRepository(dictionary: repos))
                 completion()
             } else if let error = error {
-                print("There was an error getting the repositories info: \(error.localizedDescription)")
+                print("There was an error appending the repo to the repositories array in the ReposDataStore: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func toggleStarStatus(for repo: GithubRepository, completion: @escaping (Bool) -> ()) {
+        GithubAPIClient.checkIfRepositoryIsStarred(repo.fullName) { (starred, error) in
+            if let error = error {
+                print("There was an error toggling the star status in the ReposDataStore: \(error.localizedDescription)")
+            } else if starred == true {
+                GithubAPIClient.unstarRepository(named: repo.fullName, completion: {
+                    completion(false)
+                })
+            } else {
+                GithubAPIClient.starRepository(named: repo.fullName, completion: {
+                    completion(true)
+                })
             }
         }
     }

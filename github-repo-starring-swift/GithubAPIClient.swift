@@ -37,20 +37,23 @@ struct GithubAPIClient {
             }.resume()
     }
     
-    static func checkIfRepositoryIsStarred(_ repoFullName: String, completion: @escaping (Bool) -> ()) {
+    static func checkIfRepositoryIsStarred(_ repoFullName: String, completion: @escaping (Bool?, Error?) -> ()) {
         let urlString = "https://api.github.com/user/starred/\(repoFullName)?access_token=\(Secrets.personalAccessToken)"
         guard let url = URL(string: urlString) else {
             print("There was an error unwrapping the url in the GithubAPIClient")
             return
         }
         URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let response = response as? HTTPURLResponse {
+            if let error = error {
+                completion(nil, error)
+            } else if let response = response as? HTTPURLResponse {
                 if response.statusCode == 204 {
-                    completion(true)
+                    completion(true, nil)
+                } else if response.statusCode == 404 {
+                    completion(false, nil)
                 }
-                completion(false)
             }
-        }.resume()
+            }.resume()
     }
     
     static func starRepository(named: String, completion: @escaping () -> ()) {
@@ -81,7 +84,7 @@ struct GithubAPIClient {
         request.httpMethod = "DELETE"
         _ = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             if let response = response as? HTTPURLResponse {
-               if response.statusCode == 204 {
+                if response.statusCode == 204 {
                     completion()
                 }
             }
