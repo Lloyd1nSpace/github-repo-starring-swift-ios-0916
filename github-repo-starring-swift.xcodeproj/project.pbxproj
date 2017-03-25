@@ -138,12 +138,12 @@
 		2B98D8A21D240CAA00905AE2 /* github-repo-starring-swift */ = {
 			isa = PBXGroup;
 			children = (
-				6E8DD1C81E86C7AF0088032B /* Secrets.swift */,
+				2B98D8A31D240CAA00905AE2 /* AppDelegate.swift */,
 				2B98D8D71D24798100905AE2 /* GithubAPIClient.swift */,
 				2B98D8D81D24798100905AE2 /* GithubRepository.swift */,
 				2B98D8D91D24798100905AE2 /* ReposDataStore.swift */,
 				2B98D8DA1D24798100905AE2 /* ReposTableViewController.swift */,
-				2B98D8A31D240CAA00905AE2 /* AppDelegate.swift */,
+				6E8DD1C81E86C7AF0088032B /* Secrets.swift */,
 				2B98D8A71D240CAA00905AE2 /* Main.storyboard */,
 				2B98D8AA1D240CAA00905AE2 /* Assets.xcassets */,
 				2B98D8AC1D240CAA00905AE2 /* LaunchScreen.storyboard */,
