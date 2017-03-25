@@ -1,32 +1,41 @@
 //
-//  GithubAPIClient.swift
-//  github-repo-starring-swift
+//  FISGithubAPIClient.swift
+//  github-repo-list-swift
 //
-//  Created by Haaris Muneer on 6/28/16.
+//  Created by  susan lovaglio on 10/23/16.
 //  Copyright © 2016 Flatiron School. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
-class GithubAPIClient {
+struct GithubAPIClient {
     
-    class func getRepositories(with completion: @escaping ([Any]) -> ()) {
-        let urlString = "\(githubAPIURL)/repositories?client_id=\(githubClientID)&client_secret=\(githubClientSecret)"
-        let url = URL(string: urlString)
-        let session = URLSession.shared
+    static func getRepositories(with completion: @escaping ([String : Any]?, Error?) -> ()) {
         
-        guard let unwrappedURL = url else { fatalError("Invalid URL") }
-        let task = session.dataTask(with: unwrappedURL, completionHandler: { (data, response, error) in
-            guard let data = data else { fatalError("Unable to get data \(error?.localizedDescription)") }
-            
-            if let responseArray = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] {
-                if let responseArray = responseArray {
-                    completion(responseArray)
-                }
+        let urlString = "https://api.github.com/repositories?client_id=\(Secrets.clientID)&client_secret=\(Secrets.clientSecret)"
+        guard let url = URL(string: urlString) else {
+            print("There was an error unwrapping the url in the GithubAPIClient")
+            return
+        }
+        _ = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else {
+                print("There was an error unwrapping the data in the GitHubAPIClient")
+                return
             }
-        }) 
-        task.resume()
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [[String : Any]] {
+                    for repoDict in json {
+                        completion(repoDict, nil)
+                    }
+                }
+            } catch {
+                print("There was an issue deserializing the JSON: \(error.localizedDescription)")
+                completion(nil, error)
+            }
+            if let error = error {
+                print("There was an error with the URLSession request in the GithubAPIClient: \(error.localizedDescription)")
+            }
+            }.resume()
     }
     
 }
-

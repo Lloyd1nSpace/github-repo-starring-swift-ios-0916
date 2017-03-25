@@ -1,31 +1,28 @@
 //
-//  ReposDataStore.swift
-//  github-repo-starring-swift
+//  FISReposDataStore.swift
+//  github-repo-list-swift
 //
-//  Created by Haaris Muneer on 6/28/16.
+//  Created by  susan lovaglio on 10/23/16.
 //  Copyright © 2016 Flatiron School. All rights reserved.
 //
-
-import UIKit
 
 class ReposDataStore {
     
     static let sharedInstance = ReposDataStore()
-    fileprivate init() {}
+    var repositories = [GithubRepository]()
     
-    var repositories:[GithubRepository] = []
-    
-    func getRepositories(with completion: @escaping () -> ()) {
-        GithubAPIClient.getRepositories { (reposArray) in
-            self.repositories.removeAll()
-            for dictionary in reposArray {
-                guard let repoDictionary = dictionary as? [String : Any] else { fatalError("Object in reposArray is of non-dictionary type") }
-                let repository = GithubRepository(dictionary: repoDictionary)
-                self.repositories.append(repository)
-                
+    func getRepositoriesFromAPI(_ completion: @escaping () -> ()) {
+        repositories = []
+        
+        GithubAPIClient.getRepositories { [weak self] (repos, error) in
+            guard let strongSelf = self else { return }
+            if let repos = repos {
+                strongSelf.repositories.append(GithubRepository(dictionary: repos))
+                completion()
+            } else if let error = error {
+                print("There was an error getting the repositories info: \(error.localizedDescription)")
             }
-            completion()
         }
     }
-
+    
 }
